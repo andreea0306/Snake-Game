@@ -21,8 +21,10 @@ public:
     }
 
     void draw(cv::Mat& image) {
-        for (int i = 0; i < body.size(); i++) {
-            rectangle(image, cv::Rect(body[i].x, body[i].y, GRID_SIZE, GRID_SIZE), cv::Scalar(0, 255, 0), -1);
+        for (int i = 1; i < body.size(); i++) {
+            /*rectangle(image, cv::Rect(body[i].x, body[i].y, GRID_SIZE, GRID_SIZE), cv::Scalar(150, 150, 150), -1);*/
+            //line(image, body[i], body[i-1], cv::Scalar(0, 255, 0), 10);
+            rectangle(image, cv::Rect(body[i].x, body[i].y, GRID_SIZE, GRID_SIZE), cv::Scalar(0, 0, 0), -1);
         }
     }
 
