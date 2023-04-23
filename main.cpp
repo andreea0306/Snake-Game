@@ -62,14 +62,14 @@ int main() {
             while (!game_over) {
                 // get user input
                 int key = waitKey(100);
-                if (key == 'w' || key == 'W') {
+                if (std::tolower(key) == 'w') {
                     snake.set_direction(3);
                 }
-                else if (key == 'a' || key == 'A') {
+                else if (std::tolower(key) == 'a') {
                     snake.set_direction(2);
-                } else if (key == 's' || key == 'S') {
+                } else if (std::tolower(key) == 's') {
                     snake.set_direction(1);
-                } else if (key == 'd' || key == 'D') {
+                } else if (std::tolower(key) == 'd') {
                     snake.set_direction(0);
                 }
 
