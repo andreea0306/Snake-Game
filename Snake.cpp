@@ -1,7 +1,10 @@
-//
-// Created by andreea on 8/3/23.
-//
-#include "Defines.cpp"
+////////////////////////////////////////////////////////////////////////////////
+// author: Andreea Andrei
+// file name: Snake.cpp
+// description: Snake class - creates the snake & moves & grows & draw on map
+///////////////////////////////////////////////////////////////////////////////
+
+#include "Defines.h"
 #include<opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
@@ -9,21 +12,18 @@
 class Snake {
 private:
     int direction;
-
 public:
     std::vector<cv::Point> body;
 
     Snake(int x, int y) {
         direction = 0; // start moving to the right
-        body.push_back(cv::Point(x, y)); // add the head of the snake
-        body.push_back(cv::Point(x-GRID_SIZE, y));
-        body.push_back(cv::Point(x-2*GRID_SIZE, y));
+        body.emplace_back(x, y); // add the head of the snake
+        body.emplace_back(x-GRID_SIZE, y);
+        body.emplace_back(x-2*GRID_SIZE, y); // tail
     }
 
     void draw(cv::Mat& image) {
         for (int i = 1; i < body.size(); i++) {
-            /*rectangle(image, cv::Rect(body[i].x, body[i].y, GRID_SIZE, GRID_SIZE), cv::Scalar(150, 150, 150), -1);*/
-            //line(image, body[i], body[i-1], cv::Scalar(0, 255, 0), 10);
             rectangle(image, cv::Rect(body[i].x, body[i].y, GRID_SIZE, GRID_SIZE), cv::Scalar(0, 0, 0), -1);
         }
     }
@@ -34,7 +34,7 @@ public:
         if (direction == 0) {
             head.x += GRID_SIZE;
         }
-            // down
+        // down
         else if (direction == 1) {
             head.y += GRID_SIZE;
         }
@@ -46,8 +46,8 @@ public:
         else if (direction == 3) {
             head.y -= GRID_SIZE;
         }
-        body.insert(body.begin(), head);
-        body.pop_back();
+        body.insert(body.begin(), head); // move head to the new point
+        body.pop_back(); // pop the tail
     }
 
     void set_direction(int new_direction) {
@@ -76,5 +76,4 @@ public:
     void grow() {
         body.push_back(get_tail());
     }
-
 };
