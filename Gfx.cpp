@@ -7,13 +7,16 @@
 #include "Defines.h"
 #include<opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-
+#pragma once
 class Gfx {
 private:
     int width;
     int height;
     int grid_size;
 public:
+    Gfx() {
+
+    }
     Gfx(int w, int h, int gs) {
         width = w;
         height = h;
@@ -36,5 +39,17 @@ public:
         cv::Mat blendedImage;
         cv::addWeighted(image1, alphaWeight, image2, betaWeight, 0.0, blendedImage);
         return blendedImage;
+    }
+
+    int getWidth() const {
+        return width;
+    }
+
+    int getHeight() const {
+        return height;
+    }
+
+    int getGridSize() const {
+        return grid_size;
     }
 };
