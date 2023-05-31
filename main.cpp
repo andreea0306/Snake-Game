@@ -7,7 +7,6 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-// C library headers
 #include <stdio.h>
 #include <string.h>
 
@@ -17,24 +16,13 @@
 #include<opencv2/opencv.hpp>
 #include<opencv2/core/mat.hpp>
 #include <thread>
-#include<opencv2/opencv.hpp>
-#include<opencv2/core/mat.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
-#include <iostream>
+
 
 #include "Defines.h"
 #include "Snake.cpp"
 #include "Food.cpp"
 #include "Gfx.cpp"
 
-void splitBuffer(const char* buffer, size_t bufferSize, char delimiter, std::vector<std::string>& tokens) {
-    std::istringstream iss(std::string(buffer, bufferSize));
-    std::string token;
-
-    while (std::getline(iss, token, delimiter)) {
-        tokens.push_back(token);
-    }
-}
 
 int initUart(const char* port) {
     int serialPort = open(port, O_RDWR /*| O_NOCTTY | O_NONBLOCK*/);
@@ -109,7 +97,7 @@ int main(int argc, char* argv[]) {
 
         Gfx gfx = Gfx(WIDTH, HEIGHT, GRID_SIZE);
         Snake snake(gfx.getWidth() / 2, gfx.getHeight() / 2, gfx);
-        Food food(gfx);
+        Food food(gfx, snake);
         int score = 0;
 
         std::string menu_file_path = "/home/andreea/CLionProjects/newSnakeTry/snake_start_menu.png";
@@ -144,13 +132,13 @@ int main(int argc, char* argv[]) {
                 while (true) {
                     // get user input - snake control
                     key = (char)cv::waitKey(100);
-                    if (std::tolower(key) == 'w') { // going up
+                    if (std::tolower(key) == 'w' && snake.getDirection() != 1) { // going up
                         snake.set_direction(3);
-                    } else if (std::tolower(key) == 'a') { // going left
+                    } else if (std::tolower(key) == 'a' && snake.getDirection() != 0) { // going left
                         snake.set_direction(2);
-                    } else if (std::tolower(key) == 's') { // going down
+                    } else if (std::tolower(key) == 's' && snake.getDirection() != 3) { // going down
                         snake.set_direction(1);
-                    } else if (std::tolower(key) == 'd') { // going right
+                    } else if (std::tolower(key) == 'd' && snake.getDirection() != 2) { // going right
                         snake.set_direction(0);
                     }
                     // move the snake
@@ -172,7 +160,7 @@ int main(int argc, char* argv[]) {
                         break;
                     } else if (snake.body[0] == food.get_position()) {
                         // if snake ate the food, a new apple is generated, score increases and snake grows
-                        food = Food(gfx);
+                        food = Food(gfx, snake);
                         score++;
                         //food.setGfx(gfx);
                         snake.grow();
@@ -197,13 +185,13 @@ int main(int argc, char* argv[]) {
         printf("the second argument is: %s\n", argv[1]);
         // Open the serial port. Change device path as needed (currently set to an standard FTDI USB-UART cable type device)
 
-        int serialPort = initUart("/dev/ttyUSB0");
+        int serialPort = initUart("/dev/ttyUSB1");
 
-        Gfx gfx = Gfx(WIDTHM5, HEIGHTM5, GRID_SIZEM5);
+        Gfx gfx = Gfx(WIDTH, HEIGHT, GRID_SIZE);
 
         // initialize the game variables
-        Snake snake(18, 18, gfx);
-        Food food( 36, 36, gfx);
+        Snake snake(WIDTH/2, HEIGHT/2, gfx);
+        Food food(gfx, snake);
         int score = 0;
         // add an image to the menu and resize it to fit with the initial image
         // run the game loop
@@ -215,6 +203,7 @@ int main(int argc, char* argv[]) {
             size_t bytesRead = read(serialPort, &buffer, sizeof(buffer));
             std::cout << "buffer: " << buffer << " and bytes read:" << bytesRead << std::endl;
             int move = buffer;
+
             if (move == '3' && snake.getDirection() != 1) {
                 snake.set_direction(3);
                 std::cout << "direction 3 set" << std::endl;
@@ -229,6 +218,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "direction 0 set" << std::endl;
             }
             snake.move();
+
             // check collision with food and body
             if (snake.check_collision()) {
                 std::cout << "final score: " << score << std::endl;
@@ -236,10 +226,11 @@ int main(int argc, char* argv[]) {
                 break;
             } else if (snake.body[0] == food.get_position()) {
                 // if snake ate the food, a new apple is generated, score increases and snake grows
-                food = Food(gfx);
+                food = Food(gfx, snake);
                 score++;
                 snake.grow();
             }
+
         }
         close(serialPort);
 
